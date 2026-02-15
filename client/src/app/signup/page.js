@@ -9,15 +9,21 @@ import { useAuth } from '@/context/AuthContext';
 export default function SignupPage() {
     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const { signup } = useAuth();
 
     const handleSignup = async (e) => {
         e.preventDefault();
+        setError('');
+        if (!formData.name || !formData.email || !formData.password) {
+            setError('All fields are required');
+            return;
+        }
         setLoading(true);
         try {
             await signup(formData.name, formData.email, formData.password);
         } catch (err) {
-            alert(err.response?.data?.msg || 'Signup failed');
+            setError(err.response?.data?.msg || 'Signup failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -32,6 +38,11 @@ export default function SignupPage() {
                 </div>
 
                 <form onSubmit={handleSignup} className="space-y-6">
+                    {error && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
+                            {error}
+                        </div>
+                    )}
                     <div className="relative">
                         <User className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
                         <input

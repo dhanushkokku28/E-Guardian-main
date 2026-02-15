@@ -10,15 +10,17 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const { login } = useAuth();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
         setLoading(true);
         try {
             await login(email, password);
         } catch (err) {
-            alert(err.response?.data?.msg || 'Login failed');
+            setError(err.response?.data?.msg || 'Login failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -33,6 +35,11 @@ export default function LoginPage() {
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-6">
+                    {error && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
+                            {error}
+                        </div>
+                    )}
                     <div className="relative">
                         <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
                         <input

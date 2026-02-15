@@ -7,9 +7,10 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function ScanPage() {
     const [deviceName, setDeviceName] = useState('');
-    const [category, setCategory] = useState('Smartphone');
+    const [category, setCategory] = useState('E-waste');
     const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
 
@@ -21,6 +22,13 @@ export default function ScanPage() {
 
     const handleScan = async (e) => {
         e.preventDefault();
+        setError('');
+        
+        if (!deviceName.trim()) {
+            setError('Please enter a device name');
+            return;
+        }
+
         setLoading(true);
         try {
             const formData = new FormData();
@@ -38,7 +46,7 @@ export default function ScanPage() {
             router.push('/results');
         } catch (err) {
             console.error(err);
-            alert('Scanning failed. Please check if the backend is running.');
+            setError(err.response?.data?.msg || 'Scanning failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -54,6 +62,12 @@ export default function ScanPage() {
                     <div className="p-8 sm:p-12">
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">Identify Your Waste</h1>
                         <p className="text-gray-600 mb-8">Upload an image or manually enter device details to get an e-waste analysis.</p>
+
+                        {error && (
+                            <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium">
+                                {error}
+                            </div>
+                        )}
 
                         <form onSubmit={handleScan} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
